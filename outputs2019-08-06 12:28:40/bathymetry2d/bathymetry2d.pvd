@@ -37,5 +37,6 @@
 <DataSet timestep="33" file="bathymetry2d_33.vtu" />
 <DataSet timestep="34" file="bathymetry2d_34.vtu" />
 <DataSet timestep="35" file="bathymetry2d_35.vtu" />
+<DataSet timestep="36" file="bathymetry2d_36.vtu" />
 </Collection>
 </VTKFile>
