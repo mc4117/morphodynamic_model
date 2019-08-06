@@ -112,7 +112,7 @@ diff_sisyphe = pd.read_excel('data/sisyphe_results.xlsx')
 plt.scatter(data[0], data[1], label = 'Experimental Data')
 
 
-plt.plot(diff_15['x'][diff_sisyphe['y'] == 0.55], -diff_sisyphe['Sisyphe'][diff_sisyphe['y'] == 0.55], label = 'Sisyphe')
+plt.plot(diff_sisyphe['x'][diff_sisyphe['y'] == 0.55], -diff_sisyphe['Sisyphe'][diff_sisyphe['y'] == 0.55], label = 'Sisyphe')
 plt.plot(xaxisthetis1, bathymetrythetis1, '-.', linewidth = 2, label = 'new')
 plt.legend()
 plt.show()
