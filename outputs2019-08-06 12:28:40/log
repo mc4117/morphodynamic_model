@@ -73,3 +73,5 @@ volume2d rel. error -5.0402e-03
 volume2d rel. error -5.3903e-03
    34  6120 T=   1836.00 eta norm:     1.6766 u norm:     1.9382 215.15
 volume2d rel. error -5.7512e-03
+   35  6300 T=   1890.00 eta norm:     1.6765 u norm:     1.9386 201.77
+volume2d rel. error -6.1226e-03
