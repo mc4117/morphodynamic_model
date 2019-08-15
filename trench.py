@@ -13,7 +13,6 @@ import pandas as pd
 import pylab as plt
 
 def boundary_conditions_fn_trench(bathymetry_2d, flag, morfac = 1, t_new = 0, state = 'initial'):
-#def boundary_conditions_fn_trench(morfac = 1, t_new = 0, state = 'initial'):
     """
     Define boundary conditions for problem to be used in morphological section.
     
@@ -38,7 +37,7 @@ def boundary_conditions_fn_trench(bathymetry_2d, flag, morfac = 1, t_new = 0, st
     elev_constant2 = 0.397
         
     inflow_constant = [flux_constant]
-    outflow_constant = [elev_constant2]#, -flux_constant]
+    outflow_constant = [elev_constant2]
     return swe_bnd, left_bnd_id, right_bnd_id, inflow_constant, outflow_constant, left_string, right_string
 
 # define mesh
@@ -83,9 +82,9 @@ morph.export_final_state("hydrodynamics_trench", uv, elev)
 
 # set up solver object
 solver_obj, update_forcings_tracer, diff_bathy, diff_bathy_file = morph.morphological(boundary_conditions_fn = boundary_conditions_fn_trench, morfac = 10, morfac_transport = True, suspendedload = True, convectivevel = True,\
-                    bedload = True, angle_correction = False, slope_eff = True, seccurrent = False, sediment_slide = False, fluc_bcs = False, \
+                    bedload = True, angle_correction = False, slope_eff = True, seccurrent = False, fluc_bcs = False, \
                     mesh2d = mesh2d, bathymetry_2d = bathymetry_2d, input_dir = 'hydrodynamics_trench', viscosity_hydro = 10**(-6), ks = 0.025, average_size = 160 * (10**(-6)), dt = 0.3, final_time = 15*3600,\
-                 beta_fn = 1.3, surbeta2_fn = 1/1.5, alpha_secc_fn = 0.75, angle_fn = 35, mesh_step_size = 0.2)
+                 beta_fn = 1.3, surbeta2_fn = 1/1.5, alpha_secc_fn = 0.75)
 
 
 # run model

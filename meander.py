@@ -120,9 +120,9 @@ morph.export_final_state("hydrodynamics_meander_initial_ext_grd_linux", uv, elev
 # set up solver object
 
 solver_obj, update_forcings_tracer, diff_bathy, diff_bathy_file = morph.morphological(boundary_conditions_fn = boundary_conditions_fn, morfac = 10, morfac_transport = True, suspendedload = False, convectivevel = False,\
-                    bedload = True, angle_correction = True, slope_eff = True, seccurrent = True, sediment_slide = False, fluc_bcs = True,\
+                    bedload = True, angle_correction = True, slope_eff = True, seccurrent = True, fluc_bcs = True,\
                  mesh2d = mesh2d, bathymetry_2d = input_bathymetry_2d, input_dir = 'hydrodynamics_meander_initial_ext_grd_linux', viscosity_hydro = 5*10**(-2), ks = 0.003, average_size = 10**(-3), dt = 2, final_time = 18000,\
-                 beta_fn = 1.3, surbeta2_fn = 1/1.5, alpha_secc_fn = 0.75, angle_fn = 35, mesh_step_size = 0.2)
+                 beta_fn = 1.3, surbeta2_fn = 1/1.5, alpha_secc_fn = 0.75)
 
 # run model
 t1 = time.time()

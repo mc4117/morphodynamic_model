@@ -133,9 +133,9 @@ def hydrodynamics_only(boundary_conditions_fn, mesh2d, bathymetry_2d, uv_init, e
     return solver_obj, update_forcings_hydrodynamics
 
 
-def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedload, convectivevel, bedload, angle_correction, slope_eff, seccurrent, sediment_slide,\
+def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedload, convectivevel, bedload, angle_correction, slope_eff, seccurrent, \
                  mesh2d, bathymetry_2d, input_dir, viscosity_hydro, ks, average_size, dt, final_time,\
-                 beta_fn, surbeta2_fn, alpha_secc_fn, angle_fn, mesh_step_size, friction = 'nikuradse', friction_coef = 0, d90 = 0, fluc_bcs = False, bed_form = 'meyer', sus_form = 'vanrijn', diffusivity = 0.15):
+                 beta_fn, surbeta2_fn, alpha_secc_fn, friction = 'nikuradse', friction_coef = 0, d90 = 0, fluc_bcs = False, bed_form = 'meyer', sus_form = 'vanrijn', diffusivity = 0.15):
     """
     Set up a full morphological model simulation using as an initial condition the results of a hydrodynamic only model.    
     
@@ -149,7 +149,6 @@ def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedloa
     angle_correction - switch on slope effect angle correction
     slope_eff - switch on slope effect magnitude correction
     seccurrent - switch on secondary current for helical flow effect
-    sediment_slide - switch on sediment slide mechanism to prevent steep slopes
     mesh2d - define mesh working on
     bathymetry2d - define bathymetry of problem
     input_dir - folder containing results of hydrodynamics model which are used as initial conditions here
@@ -161,8 +160,6 @@ def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedloa
     beta_fn - magnitude slope effect parameter
     surbeta2_fn - angle correction slope effect parameter
     alpha_secc_fn - secondary current parameter
-    angle_fn - maximum angle allowed by sediment slide mechanism
-    mesh_step_size - NOT for defining mesh but to be used in the sediment slide mechanism
     friction - choice of friction formulation - nikuradse and manning
     friction_coef - value of friction coefficient used in manning
     d90 - sediment size which 90% of the sediment are below
@@ -242,43 +239,9 @@ def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedloa
                 dzdx.interpolate(old_bathymetry_2d.dx(0))
                 dzdy.interpolate(old_bathymetry_2d.dx(1))
 
-                if sediment_slide == True:
-                        # add component to bedload transport to ensure the slope angle does not exceed a certain value
-                        
-                        # calculate normal to the bed
-                        nx.interpolate(dzdx/th.sqrt(1 + (dzdx**2 + dzdy**2)))
-                        ny.interpolate(dzdy/th.sqrt(1 + (dzdx**2 + dzdy**2)))
-                        nz.interpolate(1/th.sqrt(1 + (dzdx**2 + dzdy**2)))
-                    
-                        sinbeta.interpolate(th.sqrt(1 - (nz**2)))
-                        betaangle.interpolate(th.asin(sinbeta))
-                        tanbeta.assign(sinbeta/nz)
-                        
-                        # calculating magnitude of added component
-                        qaval.assign(th.conditional(tanbeta-tanphi > 0, (1-porosity)*0.5*(L**2)*(tanbeta - tanphi)/(th.cos(betaangle*dt*morfac)),0))
-                        # multiplying by direction
-                        alphaconst.interpolate(th.conditional(sinbeta > 0, - qaval*(nz**2)/sinbeta, 0))
-                        
-                        # deriving the weak form of this extra component to be added to the finite element formulation of exner equation
-                        grad_test = th.grad(v)
-                        diff_tensor = th.as_matrix([[alphaconst, 0, ], [0, alphaconst, ]])
-                        diff_flux = th.dot(diff_tensor, th.grad(-old_bathymetry_2d))
 
-                        f = th.inner(grad_test, diff_flux)*(fire.dx)
-
-                        degree_h = P1_2d.ufl_element().degree()
-                        sigma = 5.0*degree_h*(degree_h + 1)/fire.CellSize(mesh2d)
-                        if degree_h == 0:
-                            sigma = 1.5 / fire.CellSize(mesh2d)
-                                        
-                        alphaavg = th.avg(sigma)
-                        ds_interior = fire.dS
-                        f += -alphaavg*th.inner(th.jump(v, n),th.dot(th.avg(diff_tensor), th.jump(z_n, n)))*ds_interior
-                        f += -th.inner(th.avg(th.dot(diff_tensor, th.grad(v))),th.jump(z_n, n))*ds_interior
-                        f += -th.inner(th.jump(v,n), th.avg(th.dot(diff_tensor, th.grad(z_n))))*ds_interior
-                else:
-                        # initialise exner equation if not already initialised in sediment slide
-                        f = 0
+                # initialise exner equation
+                f = 0
 
                 if suspendedload == True:
                     # source term
@@ -500,10 +463,6 @@ def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedloa
     cparam = th.Constant((2650-1000)*9.81*average_size*(surbeta2**2))
     # secondary current parameter
     alpha_secc = th.Constant(alpha_secc_fn)
-    # maximum gradient allowed by sediment slide mechanism
-    tanphi = math.tan(angle_fn*math.pi/180)
-    # approximate mesh step size for sediment slide mechanism
-    L = th.Constant(mesh_step_size)
 
     # calculate critical shields parameter thetacr
     R = th.Constant(2650/1000 - 1)
@@ -566,22 +525,6 @@ def morphological(boundary_conditions_fn, morfac, morfac_transport, suspendedloa
     dzdx = th.Function(V).interpolate(old_bathymetry_2d.dx(0))
     dzdy = th.Function(V).interpolate(old_bathymetry_2d.dx(1))
 
-    if sediment_slide == True:
-        # add component to bedload transport to ensure the slope angle does not exceed a certain value
-        
-        # calculate normal to the bed
-        nx = th.Function(V).interpolate(dzdx/th.sqrt(1 + (dzdx**2 + dzdy**2)))
-        ny = th.Function(V).interpolate(dzdy/th.sqrt(1 + (dzdx**2 + dzdy**2)))
-        nz = th.Function(V).interpolate(1/th.sqrt(1 + (dzdx**2 + dzdy**2)))
-
-        sinbeta = th.Function(V).interpolate(th.sqrt(1 - (nz**2)))
-        betaangle = th.Function(V).interpolate(th.asin(sinbeta))
-        tanbeta = th.Function(V).interpolate(sinbeta/nz)
-
-        # calculating magnitude of added component
-        qaval = th.Function(V).interpolate(th.conditional(tanbeta - tanphi > 0, (1-porosity)*0.5*(L**2)*(tanbeta - tanphi)/(th.cos(betaangle*dt*morfac)), 0))
-        # multiplying by direction
-        alphaconst = th.Function(V).interpolate(th.conditional(sinbeta > 0, - qaval*(nz**2)/sinbeta, 0))
 
     if suspendedload == True:
         # deposition flux - calculating coefficient to account for stronger conc at bed
