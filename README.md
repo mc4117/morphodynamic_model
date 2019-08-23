@@ -18,6 +18,7 @@ Simulation scripts
 ------------------
 
 * Section 4: Migrating Trench Test Case
+    
     Reproduce with:
 
 ```
@@ -27,6 +28,7 @@ Simulation scripts
 
 
 * Section 5: Meander Test Case
+    
     Reproduce with:
 ```
 #!bash
