@@ -12,7 +12,7 @@ Software requirements
 1. Firedrake (www.firedrakeproject.org)
     * The version of the Firedrake model we use has been stored and can be downloaded from the following site: https://doi.org/10.5281/zenodo.3385061.
 1. Thetis (https://thetisproject.org/download.html)
-    * We use the Thetis model at the following commit id: bab2234b4f84de6c3e5244ca0e466ec15a62d991, available at: https://github.com/thetisproject/thetis/commit/bab2234b4f84de6c3e5244ca0e466ec15a62d991
+    * The version of the Thetis model we use has the following commit id, bab2234b4f84de6c3e5244ca0e466ec15a62d991, and is available at: https://github.com/thetisproject/thetis/commit/bab2234b4f84de6c3e5244ca0e466ec15a62d991
     
 3. Python 3.5 or later
 
