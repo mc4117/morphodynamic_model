@@ -50,4 +50,4 @@ To verify our hydro-morphodynamics model in Thetis, we used the Telemac-Mascaret
 The steering files for the Migrating Trench Test Case were obtained via private communication from the authors of 
 *Villaret, Catherine, et al. "First-order uncertainty analysis using Algorithmic Differentiation of morphodynamic models." Computers & Geosciences 90 (2016): 144-151.*
 
-The steering files for the Meander Test case are those for the "Yen" validation example in Sisyphe. The steering files come as part of the Telemac-Mascaret download.
+The steering files for the Meander Test case are those for the "Yen" validation example in Sisyphe. The steering files come as part of the Telemac-Mascaret download. As stated in the paper, some Sisyphe results for the meander test case that we have presented are taken directly from Villaret et al. (2016).
