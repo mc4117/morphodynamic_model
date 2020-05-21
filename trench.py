@@ -44,7 +44,7 @@ def boundary_conditions_fn_trench(bathymetry_2d, flag, morfac=1, t_new=0, state=
 # define mesh
 lx = 16
 ly = 1.1
-nx = lx*5
+nx = 32
 ny = 5
 mesh2d = th.RectangleMesh(nx, ny, lx, ly)
 
@@ -92,7 +92,7 @@ solver_obj, update_forcings_tracer, diff_bathy, diff_bathy_file = morph.morpholo
                                                                   morfac_transport=True, suspendedload=True, convectivevel=True, bedload=True,
                                                                   angle_correction=False, slope_eff=True, seccurrent=False, fluc_bcs=False, mesh2d=mesh2d,
                                                                   bathymetry_2d=bathymetry_2d, input_dir='hydrodynamics_trench', viscosity_hydro=10**(-6),
-                                                                  ks=0.025, average_size=160 * (10**(-6)), dt=0.3, final_time=15*3600, beta_fn=1.3, surbeta2_fn=1/1.5, alpha_secc_fn=0.75)
+                                                                  ks=0.025, average_size=160 * (10**(-6)), dt=0.6, final_time=15*3600, beta_fn=1.3, surbeta2_fn=1/1.5, alpha_secc_fn=0.75)
 
 # run model
 solver_obj.iterate(update_forcings=update_forcings_tracer)
@@ -114,20 +114,22 @@ plt.rc('font', family='Helvetica')
 
 data = pd.read_excel('data/experimental_data.xlsx', sheet_name='recreatepaperrun', header=None)
 diff_sisyphe = pd.read_excel('data/sisyphe_results.xlsx')
+thetisdf = pd.read_csv('model_outputs/trench_bed_output.csv')
 
 plt.scatter(data[0], data[1], label='Experimental Data')
 
-plt.plot(xaxisthetis1, bathymetrythetis1, color=colors['mediumblue'], label='Thetis')
+plt.plot(thetisdf['x'], thetisdf['bathymetry'], '--', linewidth = 3, c = colors['darkgreen'], label = r'Thetis ($\Delta x = 0.2m$)')
+plt.plot(xaxisthetis1, bathymetrythetis1, colors['mediumblue'], label = r'Thetis ($\Delta x = 0.5m$)')
 plt.plot(diff_sisyphe['x'][diff_sisyphe['y'] == 0.55], -diff_sisyphe['Sisyphe'][diff_sisyphe['y'] == 0.55], color=colors['orange'], label='Sisyphe')
 
-plt.xlabel('Location (m)')
-plt.ylabel('Bedlevel (m)')
+plt.xlabel('x (m)', fontsize=12)
+plt.ylabel(r'$z_{b}$ (m)', fontsize=12)
 plt.xlim([0, 16])
 plt.ylim([-0.155, 0.01])
 plt.legend(loc=3)
 plt.show()
 
 # record model output in csv file
-df = pd.concat([pd.DataFrame(xaxisthetis1), pd.DataFrame(bathymetrythetis1)], axis=1)
+df = pd.concat([pd.DataFrame(xaxisthetis1, columns = ['x']), pd.DataFrame(bathymetrythetis1, columns = ['bathymetry'])], axis=1)
 
-df.to_csv('model_outputs/trench_bed_output.csv')
+df.to_csv('model_outputs/trench_bed_output_coarse.csv', index = False)
